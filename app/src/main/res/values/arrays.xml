@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="collection_1_golos">
+        <item>@raw/sound_11</item>
+        <item>@raw/sound_12</item>
+        <item>@raw/sound_13</item>
+        <item>@raw/no_sound</item>
+    </array>
+    <string-array name="collection_1_names">
+        <item>Антилопа</item>
+        <item>Африканский буйвол</item>
+        <item>Бородавочник</item>
+        <item>Проверим знания?</item>
+    </string-array>
+    <array name="collection_1_namesound">
+        <item>@raw/col_11</item>
+        <item>@raw/col_12</item>
+        <item>@raw/col_13</item>
+        <item>@raw/test_now</item>
+    </array>
+    <array name="collection_1_pictures">
+        <item>@drawable/col_11</item>
+        <item>@drawable/col_12</item>
+        <item>@drawable/col_13</item>
+        <item>@drawable/check_knowlege</item>
+    </array>
+    <array name="collection_2_golos">
+        <item>@raw/sound_21</item>
+        <item>@raw/sound_22</item>
+        <item>@raw/sound_23</item>
+        <item>@raw/no_sound</item>
+    </array>
+    <string-array name="collection_2_names">
+        <item>Барсук</item>
+        <item>Белка</item>
+        <item>Бобр</item>
+        <item>Проверим знания?</item>
+    </string-array>
+    <array name="collection_2_namesound">
+        <item>@raw/col_21</item>
+        <item>@raw/col_22</item>
+        <item>@raw/col_23</item>
+        <item>@raw/test_now</item>
+    </array>
+    <array name="collection_2_pictures">
+        <item>@drawable/col_21</item>
+        <item>@drawable/col_22</item>
+        <item>@drawable/col_23</item>
+        <item>@drawable/check_knowlege</item>
+    </array>
+</resources>

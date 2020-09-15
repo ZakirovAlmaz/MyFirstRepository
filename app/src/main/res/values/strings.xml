@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">ChildPikMain</string>
+    <string name="error_activity_text">"В приложении произошла ошибка! Для улучшения качества и стабильности приложения - отправьте письмо разработчику с отчетом об ошибке. Спасибо!"</string>
+</resources>
