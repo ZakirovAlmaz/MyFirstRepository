@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">ChildPikMain</string>
     <string name="error_activity_text">"В приложении произошла ошибка! Для улучшения качества и стабильности приложения - отправьте письмо разработчику с отчетом об ошибке. Спасибо!"</string>
+    <string name="title_activity_settings">Настройки приложения</string>
+
+    <!-- Sync Preferences -->
+    <string name="PlayFoneMusicTitle">Музыка в меню</string>
+    <string name="ShowImageTextTitle">Отображать подпись на карточках</string>
+    <string name="CheckKnowledgeTitle">Включить проверку знаний в конце группы</string>
+    <string name="CheckKnowledge_off">Картинки отображаются циклично</string>
+    <string name="CheckKnowledge_on">В конце блока запускается проверка знаний</string>
 </resources>

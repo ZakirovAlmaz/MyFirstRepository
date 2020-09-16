@@ -1,11 +1,10 @@
 package com.example.childpikmain
 
-import android.graphics.Color
+import android.content.SharedPreferences
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.text.Html
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -17,8 +16,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentPagerAdapter
-import androidx.viewpager.widget.PagerAdapter
+import androidx.preference.PreferenceManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.nostra13.universalimageloader.core.ImageLoader
@@ -28,6 +26,7 @@ var imageLoader: ImageLoader? = null
 var CURRENT_PAGE = 1
 var NUM_COLLECTIONS: Int? = null
 var NUM_PAGES: Int? = null
+lateinit var prefs: SharedPreferences
 
 
 
@@ -36,15 +35,13 @@ class Main : FragmentActivity() {
     var CURRENT_PAGE = 1
     var NUM_COLLECTIONS: Int? = null
     var NUM_PAGES: Int? = null*/
-    var btnNext: ImageView? = null
-    var btnPrev: ImageView? = null
     var btnSound: ImageView? = null
     private var button_anim: Animation? = null
     var button_check_anim: Animation? = null
     var goCheckingImage: ImageView? = null
     var goCheckingImageFone: ImageView? = null
     var handler: Handler? = null
-    //private val interstitial: InterstitialAd? = null
+
     var mPlayer: MediaPlayer? = null
     private var mViewPager: ViewPager2? = null
     var rotate: Animation? = null
@@ -53,6 +50,7 @@ class Main : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         NUM_COLLECTIONS = Integer.valueOf(intent.getIntExtra("collection", 1))
         imageLoader = ImageLoader.getInstance()
@@ -65,18 +63,7 @@ class Main : FragmentActivity() {
         )
         goCheckingImage = findViewById(R.id.goCheckingImage) as ImageView
         goCheckingImageFone = findViewById(R.id.goCheckingImageFone) as ImageView
-        btnNext = findViewById(R.id.btnNext) as ImageView
-        btnPrev = findViewById(R.id.btnPrev) as ImageView
         btnSound = findViewById(R.id.btnSound) as ImageView
-        btnPrev!!.visibility = View.INVISIBLE
-        //TODO Реклама
-        /*val bundle2 = Bundle()
-        bundle2.putString("npa", "1")
-        interstitial = InterstitialAd(this)
-        interstitial.adUnitId = resources.getString(android.R.string.admob_interstitial)
-        interstitial.loadAd(
-            Builder().addNetworkExtrasBundle(AdMobAdapter::class.java, bundle2).build()
-        )*/
         try {
             if (NUM_COLLECTIONS?.toInt() == 1) {
                 NUM_PAGES =
@@ -96,23 +83,19 @@ class Main : FragmentActivity() {
                     CURRENT_PAGE = Integer.valueOf(i + 1)
                     //val unused = CURRENT_PAGE
                     if (CURRENT_PAGE == 1) {
-                        btnPrev!!.visibility = View.INVISIBLE
                     } else if (CURRENT_PAGE == NUM_PAGES) {
                         //TODO Сейчас если дошел до конца, идет проверка знаний. Надо это сделать отдельным меню, а картинки накчинать сначала
                         goCheckingImageFone!!.startAnimation(rotate)
                         goCheckingImage!!.startAnimation(button_check_anim)
                         goCheckingImage!!.visibility = View.VISIBLE
                         goCheckingImageFone!!.visibility = View.VISIBLE
-                        btnNext!!.visibility = View.INVISIBLE
                         btnSound!!.visibility = View.INVISIBLE
                     } else {
                         goCheckingImageFone!!.clearAnimation()
                         goCheckingImage!!.clearAnimation()
                         goCheckingImage!!.visibility = View.INVISIBLE
                         goCheckingImageFone!!.visibility = View.INVISIBLE
-                        btnNext!!.visibility = View.VISIBLE
                         btnSound!!.visibility = View.VISIBLE
-                        btnPrev!!.visibility = View.VISIBLE
                     }
                 }
 
@@ -135,20 +118,26 @@ class Main : FragmentActivity() {
         super.onResume()
         handler = Handler(Looper.getMainLooper())
         handler!!.postDelayed({ playSound() }, 1500)
-        /*val bundle = Bundle()
-        bundle.putString("npa", "1")
-        val adView: AdView? = findViewById(R.id.adView) as AdView?
-        val build: AdRequest =
-            Builder().addNetworkExtrasBundle(AdMobAdapter::class.java, bundle).build()
-        if (adView != null) {
-            adView.loadAd(build)
-        }*/
     }
 
     override fun onPause() {
         super.onPause()
         destroySound()
     }
+
+    fun btnBack(view: View) {
+        view.startAnimation(button_anim)
+        destroySound()
+        finish()
+        System.gc()
+    }
+
+
+    fun btnSound(view: View) {
+        view.startAnimation(button_anim)
+        playSound()
+    }
+
 
     fun playSound() {
         destroySound()
@@ -236,7 +225,6 @@ class Main : FragmentActivity() {
 
         }
         override fun getItemCount(): Int = NUM_PAGES!!.toInt()
-        //if (items.isNotEmpty()) Int.MAX_VALUE else 0
     }
 
     class PageFragment : Fragment() {
@@ -263,19 +251,17 @@ class Main : FragmentActivity() {
                 imageResource = Integer.valueOf(R.array.collection_2_pictures)
                 textResource = Integer.valueOf(R.array.collection_2_names)
             }
-            if (i == getResources().getStringArray(textResource!!.toInt()).size - 1) {
-                linearLayout.visibility = View.INVISIBLE
-            } else {
-                linearLayout.visibility = View.VISIBLE
+            if (prefs.getBoolean("ShowImageText", true)){
+                if (i == getResources().getStringArray(textResource!!.toInt()).size - 1) {
+                    linearLayout.visibility = View.INVISIBLE
+                } else {
+                    linearLayout.visibility = View.VISIBLE
+                }
+                val str: String = getResources().getStringArray(textResource!!.toInt()).get(i)
+                textView.text = str
             }
-            val str: String = getResources().getStringArray(textResource!!.toInt()).get(i)
-            textView.text = str
-            try {
-                textView.text = Html.fromHtml(
-                    "<font color=red>" + str[0] + "</font><font color=white>" + str.substring(1) + "</font>"
-                )
-            } catch (unused: Exception) {
-            }
+            else{linearLayout.visibility = View.INVISIBLE}
+
             val imageLoader: ImageLoader? = imageLoader
             if (imageLoader != null) {
                 imageLoader.displayImage(
