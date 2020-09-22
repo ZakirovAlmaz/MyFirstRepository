@@ -25,7 +25,7 @@ class Menu : AppCompatActivity() {
         setContentView(R.layout.activity_menu)
         getSupportActionBar()?.hide()
         button_anim = AnimationUtils.loadAnimation(applicationContext, R.anim.button_anim)
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs = PreferenceManager.getDefaultSharedPreferences(this)
 
         if (prefs.getBoolean("PlayFoneMusic", true)){playSound()}
     }
@@ -47,7 +47,7 @@ class Menu : AppCompatActivity() {
             openCollection(2, view)
         }
     }
-    fun clickSettings(view: View?){
+    fun clickSettings() {
         destroySound()
         startActivity(Intent(this, SettingsActivity::class.java))
     }

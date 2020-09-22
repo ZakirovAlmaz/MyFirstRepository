@@ -1,5 +1,6 @@
 package com.example.childpikmain
 
+import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -22,54 +23,55 @@ import androidx.viewpager2.widget.ViewPager2
 import com.nostra13.universalimageloader.core.ImageLoader
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration
 
+//Эти переменные должны быть внутри Main, но тогда не получается к ним обратиться в ScreenSlidePagerAdapter, как это сделать?
 var imageLoader: ImageLoader? = null
 var CURRENT_PAGE = 1
 var NUM_COLLECTIONS: Int? = null
 var NUM_PAGES: Int? = null
 lateinit var prefs: SharedPreferences
 
-
-
+//эта аннотация и дает видимость во всех внутренних классах?
+@Suppress("NAME_SHADOWING")
 class Main : FragmentActivity() {
     /*var imageLoader: ImageLoader? = null
     var CURRENT_PAGE = 1
     var NUM_COLLECTIONS: Int? = null
     var NUM_PAGES: Int? = null*/
     var btnSound: ImageView? = null
-    private var button_anim: Animation? = null
-    var button_check_anim: Animation? = null
+    private var buttonAnim: Animation? = null
+    var buttonCheckAnim: Animation? = null
     var goCheckingImage: ImageView? = null
-    var goCheckingImageFone: ImageView? = null
-    var handler: Handler? = null
+    var goCheckingImageBack: ImageView? = null
+    private var handler: Handler? = null
 
-    var mPlayer: MediaPlayer? = null
+    private var mPlayer: MediaPlayer? = null
     private var mViewPager: ViewPager2? = null
     var rotate: Animation? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        this.setContentView(R.layout.activity_main)
+        prefs = PreferenceManager.getDefaultSharedPreferences(this)
 
         NUM_COLLECTIONS = Integer.valueOf(intent.getIntExtra("collection", 1))
         imageLoader = ImageLoader.getInstance()
         imageLoader!!.init(ImageLoaderConfiguration.createDefault(applicationContext))
-        button_anim = AnimationUtils.loadAnimation(applicationContext, R.anim.button_anim)
+        buttonAnim = AnimationUtils.loadAnimation(applicationContext, R.anim.button_anim)
         rotate = AnimationUtils.loadAnimation(applicationContext, R.anim.rotate_circle)
-        button_check_anim = AnimationUtils.loadAnimation(
+        buttonCheckAnim = AnimationUtils.loadAnimation(
             applicationContext,
             R.anim.button_check_anim
         )
-        goCheckingImage = findViewById(R.id.goCheckingImage) as ImageView
-        goCheckingImageFone = findViewById(R.id.goCheckingImageFone) as ImageView
-        btnSound = findViewById(R.id.btnSound) as ImageView
+        goCheckingImage = findViewById<ImageView>(R.id.goCheckingImage)
+        goCheckingImageBack = findViewById<ImageView>(R.id.goCheckingImageFone) as ImageView
+        btnSound = findViewById(R.id.btnSound)
         try {
-            if (NUM_COLLECTIONS?.toInt() == 1) {
+            if (NUM_COLLECTIONS == 1) {
                 NUM_PAGES =
                     Integer.valueOf(resources.getStringArray(R.array.collection_1_names).size)
             }
-            if (NUM_COLLECTIONS?.toInt() == 2) {
+            if (NUM_COLLECTIONS == 2) {
                 NUM_PAGES =
                     Integer.valueOf(resources.getStringArray(R.array.collection_2_names).size)
             }
@@ -82,19 +84,18 @@ class Main : FragmentActivity() {
                 override fun onPageSelected(i: Int) {
                     CURRENT_PAGE = Integer.valueOf(i + 1)
                     //val unused = CURRENT_PAGE
-                    if (CURRENT_PAGE == 1) {
-                    } else if (CURRENT_PAGE == NUM_PAGES) {
+                    if (CURRENT_PAGE == NUM_PAGES) {
                         //TODO Сейчас если дошел до конца, идет проверка знаний. Надо это сделать отдельным меню, а картинки накчинать сначала
-                        goCheckingImageFone!!.startAnimation(rotate)
-                        goCheckingImage!!.startAnimation(button_check_anim)
+                        goCheckingImageBack!!.startAnimation(rotate)
+                        goCheckingImage!!.startAnimation(buttonCheckAnim)
                         goCheckingImage!!.visibility = View.VISIBLE
-                        goCheckingImageFone!!.visibility = View.VISIBLE
+                        goCheckingImageBack!!.visibility = View.VISIBLE
                         btnSound!!.visibility = View.INVISIBLE
                     } else {
-                        goCheckingImageFone!!.clearAnimation()
-                        goCheckingImage!!.clearAnimation()
-                        goCheckingImage!!.visibility = View.INVISIBLE
-                        goCheckingImageFone!!.visibility = View.INVISIBLE
+                        goCheckingImageBack!!.clearAnimation()
+                        this@Main.goCheckingImage!!.clearAnimation()
+                        this@Main.goCheckingImage!!.visibility = View.INVISIBLE
+                        goCheckingImageBack!!.visibility = View.INVISIBLE
                         btnSound!!.visibility = View.VISIBLE
                     }
                 }
@@ -126,7 +127,7 @@ class Main : FragmentActivity() {
     }
 
     fun btnBack(view: View) {
-        view.startAnimation(button_anim)
+        view.startAnimation(buttonAnim)
         destroySound()
         finish()
         System.gc()
@@ -134,11 +135,13 @@ class Main : FragmentActivity() {
 
 
     fun btnSound(view: View) {
-        view.startAnimation(button_anim)
+        view.startAnimation(buttonAnim)
         playSound()
     }
 
 
+    // не совсем понял, что дает аннотация Reycle и что она подавляет и стоит ли его использовать в конкретном контексте
+    @SuppressLint("Recycle")
     fun playSound() {
         destroySound()
         try {
@@ -164,6 +167,7 @@ class Main : FragmentActivity() {
                 //val unused = main.mPlayer
                 mPlayer!!.start()
 
+                //ворнинг связан как ра таки с местом объявления переменной, не знаю как исправить
                 handler!!.postDelayed({
                     var valueOf = if (NUM_COLLECTIONS!!.toInt() == 1) Integer.valueOf(
                         resources.obtainTypedArray(R.array.collection_1_golos)
@@ -200,7 +204,7 @@ class Main : FragmentActivity() {
         mpClear()
     }
 
-    fun mpClear() {
+    private fun mpClear() {
         try {
             if (mPlayer != null) {
                 mPlayer!!.stop()
@@ -230,6 +234,9 @@ class Main : FragmentActivity() {
     class PageFragment : Fragment() {
         private var imageResource: Int? = null
         private var textResource: Int? = null
+
+        //аналогично, не до конца понимаю нужна ли эта аннотация.
+        @SuppressLint("Recycle")
         override fun onCreateView(
             layoutInflater: LayoutInflater,
             viewGroup: ViewGroup?,
@@ -242,7 +249,7 @@ class Main : FragmentActivity() {
             val linearLayout = viewGroup2.findViewById<View>(R.id.textLayout) as LinearLayout
             val arguments: Bundle? = getArguments()
             val i: Int = arguments!!.getInt("position")
-            val i2:Int = arguments!!.getInt("collection")
+            val i2:Int = arguments.getInt("collection")
             if (i2 == 1) {
                 imageResource = Integer.valueOf(R.array.collection_1_pictures)
                 textResource = Integer.valueOf(R.array.collection_1_names)
@@ -257,7 +264,7 @@ class Main : FragmentActivity() {
                 } else {
                     linearLayout.visibility = View.VISIBLE
                 }
-                val str: String = getResources().getStringArray(textResource!!.toInt()).get(i)
+                val str: String = resources.getStringArray(textResource!!.toInt()).get(i)
                 textView.text = str
             }
             else{linearLayout.visibility = View.INVISIBLE}
