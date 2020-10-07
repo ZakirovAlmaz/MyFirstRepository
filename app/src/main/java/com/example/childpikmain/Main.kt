@@ -23,20 +23,14 @@ import androidx.viewpager2.widget.ViewPager2
 import com.nostra13.universalimageloader.core.ImageLoader
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration
 
-//Эти переменные должны быть внутри Main, но тогда не получается к ним обратиться в ScreenSlidePagerAdapter, как это сделать?
-var imageLoader: ImageLoader? = null
-var CURRENT_PAGE = 1
-var NUM_COLLECTIONS: Int? = null
-var NUM_PAGES: Int? = null
-lateinit var prefs: SharedPreferences
 
-//эта аннотация и дает видимость во всех внутренних классах?
-@Suppress("NAME_SHADOWING")
 class Main : FragmentActivity() {
-    /*var imageLoader: ImageLoader? = null
+    var imageLoader: ImageLoader? = null
     var CURRENT_PAGE = 1
     var NUM_COLLECTIONS: Int? = null
-    var NUM_PAGES: Int? = null*/
+    var NUM_PAGES: Int? = null
+    lateinit var prefs: SharedPreferences
+
     var btnSound: ImageView? = null
     private var buttonAnim: Animation? = null
     var buttonCheckAnim: Animation? = null
@@ -54,7 +48,7 @@ class Main : FragmentActivity() {
         this.setContentView(R.layout.activity_main)
         prefs = PreferenceManager.getDefaultSharedPreferences(this)
 
-        NUM_COLLECTIONS = Integer.valueOf(intent.getIntExtra("collection", 1))
+        NUM_COLLECTIONS = intent.getIntExtra("collection", 1)
         imageLoader = ImageLoader.getInstance()
         imageLoader!!.init(ImageLoaderConfiguration.createDefault(applicationContext))
         buttonAnim = AnimationUtils.loadAnimation(applicationContext, R.anim.button_anim)
@@ -69,11 +63,11 @@ class Main : FragmentActivity() {
         try {
             if (NUM_COLLECTIONS == 1) {
                 NUM_PAGES =
-                    Integer.valueOf(resources.getStringArray(R.array.collection_1_names).size)
+                    resources.getStringArray(R.array.collection_1_names).size
             }
             if (NUM_COLLECTIONS == 2) {
                 NUM_PAGES =
-                    Integer.valueOf(resources.getStringArray(R.array.collection_2_names).size)
+                   resources.getStringArray(R.array.collection_2_names).size
             }
 
             mViewPager = findViewById(R.id.pager) as ViewPager2
@@ -81,23 +75,26 @@ class Main : FragmentActivity() {
 
             mViewPager!!.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 //override fun onPageScrolled(i: Int, f: Float, i2: Int) {}
+
                 override fun onPageSelected(i: Int) {
-                    CURRENT_PAGE = Integer.valueOf(i + 1)
+                    Log.d("TEST i", i.toString())
+
+                    CURRENT_PAGE = i + 1
                     //val unused = CURRENT_PAGE
-                    if (CURRENT_PAGE == NUM_PAGES) {
+                    /*if (CURRENT_PAGE == NUM_PAGES) {
                         //TODO Сейчас если дошел до конца, идет проверка знаний. Надо это сделать отдельным меню, а картинки накчинать сначала
                         goCheckingImageBack!!.startAnimation(rotate)
                         goCheckingImage!!.startAnimation(buttonCheckAnim)
                         goCheckingImage!!.visibility = View.VISIBLE
                         goCheckingImageBack!!.visibility = View.VISIBLE
                         btnSound!!.visibility = View.INVISIBLE
-                    } else {
+                    } else {*/
                         goCheckingImageBack!!.clearAnimation()
                         this@Main.goCheckingImage!!.clearAnimation()
                         this@Main.goCheckingImage!!.visibility = View.INVISIBLE
                         goCheckingImageBack!!.visibility = View.INVISIBLE
                         btnSound!!.visibility = View.VISIBLE
-                    }
+                    //}
                 }
 
                 override fun onPageScrollStateChanged(i: Int) {
@@ -115,6 +112,7 @@ class Main : FragmentActivity() {
         }
 
     }
+
     override fun onResume() {
         super.onResume()
         handler = Handler(Looper.getMainLooper())
@@ -130,7 +128,6 @@ class Main : FragmentActivity() {
         view.startAnimation(buttonAnim)
         destroySound()
         finish()
-        System.gc()
     }
 
 
@@ -141,25 +138,25 @@ class Main : FragmentActivity() {
 
 
     // не совсем понял, что дает аннотация Reycle и что она подавляет и стоит ли его использовать в конкретном контексте
-    @SuppressLint("Recycle")
     fun playSound() {
         destroySound()
         try {
             handler = Handler(Looper.getMainLooper())
+            Log.d("TEST palysound CURRENT_PAGE", CURRENT_PAGE.toString())
             handler!!.postDelayed({
-                var valueOf = if (NUM_COLLECTIONS!!.toInt() == 1) Integer.valueOf(
+                var valueOf = if (NUM_COLLECTIONS!!.toInt() == 1)
                     resources.obtainTypedArray(R.array.collection_1_namesound)
                         .getResourceId(
                             CURRENT_PAGE - 1, 0
                         )
-                ) else null
+                else null
                 if (NUM_COLLECTIONS!!.toInt() == 2) {
-                    valueOf = Integer.valueOf(
+                    valueOf =
                         resources.obtainTypedArray(R.array.collection_2_namesound)
                             .getResourceId(
                                 CURRENT_PAGE - 1, 0
                             )
-                    )
+
                 }
                 mpClear()
                 //val main = this@Main
@@ -167,21 +164,20 @@ class Main : FragmentActivity() {
                 //val unused = main.mPlayer
                 mPlayer!!.start()
 
-                //ворнинг связан как ра таки с местом объявления переменной, не знаю как исправить
                 handler!!.postDelayed({
-                    var valueOf = if (NUM_COLLECTIONS!!.toInt() == 1) Integer.valueOf(
+                    var valueOf = if (NUM_COLLECTIONS!!.toInt() == 1)
                         resources.obtainTypedArray(R.array.collection_1_golos)
                             .getResourceId(
                                 CURRENT_PAGE - 1, 0
                             )
-                    ) else null
+                    else null
                     if (NUM_COLLECTIONS!!.toInt() == 2) {
-                        valueOf = Integer.valueOf(
+                        valueOf =
                             resources.obtainTypedArray(R.array.collection_2_golos)
                                 .getResourceId(
                                     CURRENT_PAGE - 1, 0
                                 )
-                        )
+
                     }
                     mpClear()
                     mPlayer = MediaPlayer.create(applicationContext, valueOf!!.toInt())
@@ -217,17 +213,23 @@ class Main : FragmentActivity() {
         }
     }
 
-    inner class ScreenSlidePagerAdapter(activity: FragmentActivity) : FragmentStateAdapter(activity) {
+    inner class ScreenSlidePagerAdapter(activity: FragmentActivity) :
+        FragmentStateAdapter(activity) {
 
         override fun createFragment(position: Int): Fragment {
+            Log.d("TEST position ", (position).toString())
+            Log.d("TEST CURRENT_PAGE ", (CURRENT_PAGE).toString())
+
             val fragment = PageFragment()
             val bundle = Bundle()
+
             bundle.putInt("position", position)
             bundle.putInt("collection", NUM_COLLECTIONS!!.toInt())
             fragment.arguments = bundle
-            return  fragment
+            return fragment
 
         }
+
         override fun getItemCount(): Int = NUM_PAGES!!.toInt()
     }
 
@@ -235,8 +237,6 @@ class Main : FragmentActivity() {
         private var imageResource: Int? = null
         private var textResource: Int? = null
 
-        //аналогично, не до конца понимаю нужна ли эта аннотация.
-        @SuppressLint("Recycle")
         override fun onCreateView(
             layoutInflater: LayoutInflater,
             viewGroup: ViewGroup?,
@@ -247,33 +247,39 @@ class Main : FragmentActivity() {
             val textView = viewGroup2.findViewById<View>(R.id.text) as TextView
             val imageView = viewGroup2.findViewById<View>(R.id.image) as ImageView
             val linearLayout = viewGroup2.findViewById<View>(R.id.textLayout) as LinearLayout
-            val arguments: Bundle? = getArguments()
-            val i: Int = arguments!!.getInt("position")
-            val i2:Int = arguments.getInt("collection")
-            if (i2 == 1) {
-                imageResource = Integer.valueOf(R.array.collection_1_pictures)
-                textResource = Integer.valueOf(R.array.collection_1_names)
+            val arguments: Bundle = arguments!!
+            var position: Int = arguments.getInt("position")
+            val collection: Int = arguments.getInt("collection")
+
+
+            if (collection == 1) {
+                imageResource = R.array.collection_1_pictures
+                textResource = R.array.collection_1_names
             }
-            if (i2 == 2) {
-                imageResource = Integer.valueOf(R.array.collection_2_pictures)
-                textResource = Integer.valueOf(R.array.collection_2_names)
+            if (collection == 2) {
+                imageResource = R.array.collection_2_pictures
+                textResource = R.array.collection_2_names
             }
-            if (prefs.getBoolean("ShowImageText", true)){
-                if (i == getResources().getStringArray(textResource!!.toInt()).size - 1) {
+            Log.d("TEST position ", (position).toString())
+
+            if (PreferenceManager.getDefaultSharedPreferences(activity)
+                    .getBoolean("ShowImageText", true)
+            ) {
+                if (position == getResources().getStringArray(textResource!!.toInt()).size - 1) {
                     linearLayout.visibility = View.INVISIBLE
                 } else {
                     linearLayout.visibility = View.VISIBLE
                 }
-                val str: String = resources.getStringArray(textResource!!.toInt()).get(i)
+                val str: String = resources.getStringArray(textResource!!.toInt()).get(position)
                 textView.text = str
+            } else {
+                linearLayout.visibility = View.INVISIBLE
             }
-            else{linearLayout.visibility = View.INVISIBLE}
-
-            val imageLoader: ImageLoader? = imageLoader
+            val imageLoader: ImageLoader? = ImageLoader.getInstance()
             if (imageLoader != null) {
                 imageLoader.displayImage(
                     "drawable://" + getResources().obtainTypedArray(imageResource!!.toInt())
-                        .getResourceId(i, 0), imageView
+                        .getResourceId(position, 0), imageView
                 )
             }
             return viewGroup2

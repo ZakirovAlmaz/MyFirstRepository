@@ -47,7 +47,7 @@ class Menu : AppCompatActivity() {
             openCollection(2, view)
         }
     }
-    fun clickSettings() {
+    fun clickSettings(view: View?) {
         destroySound()
         startActivity(Intent(this, SettingsActivity::class.java))
     }
@@ -70,7 +70,7 @@ class Menu : AppCompatActivity() {
             handler!!.postDelayed({
                 mpClear()
                 mPlayer = MediaPlayer.create(this, R.raw.sound_menu)
-                mPlayer!!.start()
+                    .also(MediaPlayer::start)
 
             }, 0)
         } catch (e: java.lang.Exception) {
@@ -80,21 +80,16 @@ class Menu : AppCompatActivity() {
     }
 
     fun destroySound() {
-        try {
-            handler!!.removeCallbacksAndMessages(null as Any?)
-        } catch (e: Exception) {
-            Log.i("Log", "destroySound - " + e.message)
-        }
+        handler?.removeCallbacksAndMessages(null as Any?)
         mpClear()
     }
 
     fun mpClear() {
         try {
-            if (mPlayer != null) {
-                mPlayer!!.stop()
-                mPlayer!!.release()
+            mPlayer?.let { player ->
+                player.stop()
+                player.release()
                 mPlayer = null
-                Log.i("Log", "++++++++++++++++++++ mpClear CLEAR")
             }
         } catch (unused: java.lang.Exception) {
             Log.i("Log", "++++++++++++++++++++ mpClear ERROR")

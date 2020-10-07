@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:ads="http://schemas.android.com/apk/res-auto" android:orientation="vertical" android:background="@drawable/ic_launcher_background" android:layout_width="match_parent" android:layout_height="match_parent" android:keepScreenOn="true">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:background="@drawable/ic_launcher_background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:keepScreenOn="true">
 
     <ImageView android:layout_width="match_parent" android:layout_height="wrap_content" android:src="@drawable/main_menu_up" android:scaleType="fitStart" android:layout_alignParentTop="true" android:contentDescription="@string/app_name"/>
     <TableLayout android:layout_width="match_parent" android:layout_height="match_parent">
@@ -13,14 +19,16 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:onClick="clickMenu1"
-                android:src="@drawable/menu1" />
+                android:src="@drawable/menu1"
+                android:contentDescription="TODO" />
 
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:src="@drawable/menu2"
                 android:layout_weight="1"
-                android:onClick="clickMenu2" />
+                android:onClick="clickMenu2"
+                android:contentDescription="TODO" />
         </TableRow>
 
         <TableRow
@@ -44,7 +52,8 @@
                 android:text="   Настройки"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:textColor="@android:color/background_dark"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                tools:ignore="RtlHardcoded" />
         </TableRow>
     </TableLayout>
 </RelativeLayout>
